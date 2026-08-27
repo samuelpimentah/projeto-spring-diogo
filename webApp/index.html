@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PicPay RH · Contratação de Funcionários</title>
+  <meta name="description" content="Sistema web para cadastro, consulta, atualização e exclusão de candidatos no processo de contratação." />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#conteudo-principal">Pular para o conteúdo principal</a>
+
+  <header class="topbar">
+    <div class="topbar__brand">
+      <span class="topbar__logo" aria-hidden="true">RH</span>
+      <div class="topbar__titulos">
+        <p class="topbar__titulo">PicPay RH</p>
+        <p class="topbar__subtitulo">Contratação de Funcionários</p>
+      </div>
+    </div>
+
+    <form class="busca-id" id="form-busca-id" aria-label="Buscar funcionário pelo ID (GET /funcionarios/{id})">
+      <label for="input-busca-id" class="sr-only">Buscar funcionário por ID</label>
+      <input
+        type="number"
+        id="input-busca-id"
+        name="id"
+        min="1"
+        inputmode="numeric"
+        placeholder="Buscar por ID..."
+        autocomplete="off"
+      />
+      <button type="submit" class="busca-id__botao" aria-label="Buscar">
+        <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="7"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+      </button>
+    </form>
+
+    <button
+      type="button"
+      class="btn btn--primario topbar__novo"
+      command="show-modal"
+      commandfor="dialog-funcionario"
+      id="btn-novo-funcionario"
+    >
+      <span aria-hidden="true">+</span> Novo funcionário
+    </button>
+  </header>
+
+  <main id="conteudo-principal">
+    <h1 class="sr-only">Painel de gerenciamento de candidatos</h1>
+
+    <section class="indicadores" aria-label="Indicadores e filtro por status (GET /funcionarios)">
+      <ul class="indicadores__lista" id="lista-indicadores">
+        <li>
+          <button type="button" class="indicador indicador--total is-ativo" data-status="TODOS" aria-pressed="true">
+            <span class="indicador__numero" id="contagem-TODOS">0</span>
+            <span class="indicador__rotulo">Total</span>
+          </button>
+        </li>
+        <li>
+          <button type="button" class="indicador indicador--analise" data-status="EM_ANALISE" aria-pressed="false">
+            <span class="indicador__numero" id="contagem-EM_ANALISE">0</span>
+            <span class="indicador__rotulo">Em análise</span>
+          </button>
+        </li>
+        <li>
+          <button type="button" class="indicador indicador--aprovado" data-status="APROVADO" aria-pressed="false">
+            <span class="indicador__numero" id="contagem-APROVADO">0</span>
+            <span class="indicador__rotulo">Aprovados</span>
+          </button>
+        </li>
+        <li>
+          <button type="button" class="indicador indicador--reprovado" data-status="REPROVADO" aria-pressed="false">
+            <span class="indicador__numero" id="contagem-REPROVADO">0</span>
+            <span class="indicador__rotulo">Reprovados</span>
+          </button>
+        </li>
+        <li>
+          <button type="button" class="indicador indicador--contratado" data-status="CONTRATADO" aria-pressed="false">
+            <span class="indicador__numero" id="contagem-CONTRATADO">0</span>
+            <span class="indicador__rotulo">Contratados</span>
+          </button>
+        </li>
+      </ul>
+      <p class="indicadores__dica">
+        Clique em um indicador para filtrar a lista pelo status correspondente.
+      </p>
+    </section>
+
+    <section class="painel" aria-labelledby="painel-titulo">
+      <div class="painel__cabecalho">
+        <h2 id="painel-titulo">Candidatos</h2>
+
+        <div class="painel__busca">
+          <label for="input-busca-texto" class="sr-only">Pesquisar por nome, cargo ou status</label>
+          <input
+            type="search"
+            id="input-busca-texto"
+            placeholder="Pesquisar por nome, cargo ou status..."
+            autocomplete="off"
+          />
+        </div>
+      </div>
+
+      <p id="mensagem-status" class="mensagem-status" role="status" aria-live="polite"></p>
+
+      <div class="tabela-wrapper" id="tabela-wrapper" aria-busy="false">
+        <table class="tabela-funcionarios">
+          <caption class="sr-only">Lista de funcionários cadastrados no processo de contratação</caption>
+          <thead>
+            <tr>
+              <th scope="col">Nome</th>
+              <th scope="col">Cargo</th>
+              <th scope="col">Departamento</th>
+              <th scope="col">Cidade</th>
+              <th scope="col">Salário</th>
+              <th scope="col">Status</th>
+              <th scope="col"><span class="sr-only">Ações</span></th>
+            </tr>
+          </thead>
+          <tbody id="tabela-corpo"></tbody>
+        </table>
+
+        <p id="lista-vazia" class="lista-vazia" hidden>Nenhum funcionário encontrado.</p>
+      </div>
+    </section>
+
+    <footer class="rodape">
+      <p>
+        Front-end em HTML, CSS e JavaScript · Comunicação via <strong>fetch</strong> com a API REST
+        Spring Boot (<code>/funcionarios</code>).
+      </p>
+    </footer>
+  </main>
+
+  <!-- Dialog: cadastro (POST) e edição completa (PUT) -->
+  <dialog id="dialog-funcionario" class="dialog" aria-labelledby="dialog-funcionario-titulo">
+    <div class="dialog__painel">
+      <form id="form-funcionario" novalidate>
+        <div class="dialog__cabecalho">
+          <h2 id="dialog-funcionario-titulo">Novo funcionário</h2>
+          <button type="button" class="dialog__fechar" command="close" commandfor="dialog-funcionario" aria-label="Fechar formulário">
+            &times;
+          </button>
+        </div>
+
+        <p id="form-funcionario-erro" class="form-erro" role="alert" hidden></p>
+
+        <div class="campos-grid">
+          <div class="campo campo--largo">
+            <label for="campo-nome">Nome <span aria-hidden="true">*</span></label>
+            <input type="text" id="campo-nome" name="nome" required autocomplete="off" />
+          </div>
+
+          <div class="campo">
+            <label for="campo-email">E-mail <span aria-hidden="true">*</span></label>
+            <input type="email" id="campo-email" name="email" required autocomplete="off" />
+          </div>
+
+          <div class="campo">
+            <label for="campo-telefone">Telefone</label>
+            <input type="tel" id="campo-telefone" name="telefone" autocomplete="off" />
+          </div>
+
+          <div class="campo">
+            <label for="campo-cargo">Cargo <span aria-hidden="true">*</span></label>
+            <input type="text" id="campo-cargo" name="cargo" required autocomplete="off" />
+          </div>
+
+          <div class="campo">
+            <label for="campo-departamento">Departamento</label>
+            <input type="text" id="campo-departamento" name="departamento" autocomplete="off" />
+          </div>
+
+          <div class="campo">
+            <label for="campo-salario">Salário</label>
+            <input type="number" id="campo-salario" name="salario" min="0" step="0.01" inputmode="decimal" />
+          </div>
+
+          <div class="campo">
+            <label for="campo-cidade">Cidade</label>
+            <input type="text" id="campo-cidade" name="cidade" autocomplete="off" />
+          </div>
+
+          <div class="campo">
+            <label for="campo-status">Status</label>
+            <select id="campo-status" name="status">
+              <option value="EM_ANALISE">Em análise</option>
+              <option value="APROVADO">Aprovado</option>
+              <option value="REPROVADO">Reprovado</option>
+              <option value="CONTRATADO">Contratado</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="dialog__rodape">
+          <button type="button" class="btn btn--secundario" command="close" commandfor="dialog-funcionario">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn--primario" id="botao-salvar-funcionario">Cadastrar</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- Dialog: atualização parcial (PATCH) -->
+  <dialog id="dialog-patch" class="dialog dialog--pequeno" aria-labelledby="dialog-patch-titulo">
+    <div class="dialog__painel">
+      <form id="form-patch" novalidate>
+        <div class="dialog__cabecalho">
+          <h2 id="dialog-patch-titulo">Atualização parcial</h2>
+          <button type="button" class="dialog__fechar" command="close" commandfor="dialog-patch" aria-label="Fechar formulário">
+            &times;
+          </button>
+        </div>
+
+        <p class="dialog__descricao">
+          Altere apenas os campos desejados. Os demais dados do candidato permanecem inalterados (PATCH).
+        </p>
+
+        <p id="form-patch-erro" class="form-erro" role="alert" hidden></p>
+
+        <div class="campos-grid">
+          <div class="campo">
+            <label for="patch-cargo">Cargo</label>
+            <input type="text" id="patch-cargo" name="cargo" autocomplete="off" />
+          </div>
+
+          <div class="campo">
+            <label for="patch-salario">Salário</label>
+            <input type="number" id="patch-salario" name="salario" min="0" step="0.01" inputmode="decimal" />
+          </div>
+
+          <div class="campo campo--largo">
+            <label for="patch-status">Status</label>
+            <select id="patch-status" name="status">
+              <option value="EM_ANALISE">Em análise</option>
+              <option value="APROVADO">Aprovado</option>
+              <option value="REPROVADO">Reprovado</option>
+              <option value="CONTRATADO">Contratado</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="dialog__rodape">
+          <button type="button" class="btn btn--secundario" command="close" commandfor="dialog-patch">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn--primario">Salvar alterações</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- Dialog: confirmação de exclusão (DELETE) -->
+  <dialog id="dialog-excluir" class="dialog dialog--pequeno" aria-labelledby="dialog-excluir-titulo">
+    <div class="dialog__painel">
+      <div class="dialog__cabecalho">
+        <h2 id="dialog-excluir-titulo">Excluir funcionário</h2>
+        <button type="button" class="dialog__fechar" command="close" commandfor="dialog-excluir" aria-label="Fechar">
+          &times;
+        </button>
+      </div>
+
+      <p>
+        Tem certeza que deseja excluir <strong id="nome-excluir">este candidato</strong>? Essa ação não
+        pode ser desfeita.
+      </p>
+
+      <p id="form-excluir-erro" class="form-erro" role="alert" hidden></p>
+
+      <div class="dialog__rodape">
+        <button type="button" class="btn btn--secundario" command="close" commandfor="dialog-excluir">
+          Cancelar
+        </button>
+        <button type="button" class="btn btn--perigo" id="botao-confirmar-exclusao">Excluir</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Dialog: detalhes de um funcionário (GET /funcionarios/{id}) -->
+  <dialog id="dialog-detalhes" class="dialog dialog--pequeno" aria-labelledby="dialog-detalhes-titulo">
+    <div class="dialog__painel">
+      <div class="dialog__cabecalho">
+        <h2 id="dialog-detalhes-titulo">Detalhes do candidato</h2>
+        <button type="button" class="dialog__fechar" command="close" commandfor="dialog-detalhes" aria-label="Fechar">
+          &times;
+        </button>
+      </div>
+
+      <dl class="detalhes-lista" id="detalhes-lista"></dl>
+
+      <div class="dialog__rodape">
+        <button type="button" class="btn btn--secundario" command="close" commandfor="dialog-detalhes">
+          Fechar
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="js/config.js"></script>
+  <script src="js/model/funcionario.model.js"></script>
+  <script src="js/service/funcionario.service.js"></script>
+  <script src="js/controller/funcionario.controller.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
