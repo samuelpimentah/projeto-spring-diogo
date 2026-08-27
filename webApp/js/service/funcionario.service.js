@@ -34,7 +34,7 @@ const FuncionarioService = (() => {
       response = await fetch(url, opcoes);
     } catch {
       throw new Error(
-        "Não foi possível conectar à API. Verifique se o back-end Spring Boot está em execução e se o CORS está liberado."
+        "Não foi possível conectar à API."
       );
     }
     return tratarResposta(response);
