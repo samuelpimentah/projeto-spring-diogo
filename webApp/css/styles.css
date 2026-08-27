@@ -127,6 +127,7 @@ select {
   height: 44px;
   flex-shrink: 0;
   border-radius: var(--raio-pequeno);
+  object-fit: cover;
 }
 
 .topbar__titulo {
@@ -467,10 +468,11 @@ main {
   padding: 0;
   border-radius: var(--raio);
   width: min(560px, 92vw);
+  max-width: calc(100vw - 2rem);
   max-height: 88vh;
   box-shadow: var(--sombra-dialog);
   background: transparent;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .dialog--pequeno {
@@ -486,8 +488,10 @@ main {
   background: var(--cor-superficie);
   border-radius: var(--raio);
   padding: 1.5rem;
+  width: 100%;
   max-height: 88vh;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* Animação leve de entrada (com fallback seguro em navegadores sem suporte) */
@@ -562,7 +566,7 @@ main {
 
 .campos-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.9rem;
 }
 
@@ -570,6 +574,7 @@ main {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
+  min-width: 0;
 }
 
 .campo--largo {
@@ -584,6 +589,9 @@ main {
 
 .campo input,
 .campo select {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   border: 1px solid var(--cor-borda);
   border-radius: var(--raio-pequeno);
   padding: 0.55rem 0.75rem;
@@ -601,6 +609,7 @@ main {
   display: flex;
   justify-content: flex-end;
   gap: 0.6rem;
+  flex-wrap: wrap;
   margin-top: 1.25rem;
 }
 
@@ -720,5 +729,17 @@ main {
   .indicadores__lista li {
     flex-basis: calc(50% - 0.45rem);
     max-width: none;
+  }
+
+  .dialog__painel {
+    padding: 1.1rem;
+  }
+
+  .dialog__rodape {
+    flex-direction: column-reverse;
+  }
+
+  .dialog__rodape .btn {
+    width: 100%;
   }
 }
