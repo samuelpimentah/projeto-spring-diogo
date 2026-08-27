@@ -1,15 +1,15 @@
 /* ===========================================================
-   PicPay RH — Design tokens (paleta inspirada em ref_design.png)
+   PicPay RH — Design tokens (paleta oficial PicPay: verde + preto)
    =========================================================== */
 :root {
-  --cor-primaria: #6c5ce7;
-  --cor-primaria-escura: #5646c9;
-  --cor-primaria-clara: #efeafc;
-  --cor-fundo: #f5f4fc;
+  --cor-primaria: #21c25e;
+  --cor-primaria-escura: #189b4c;
+  --cor-primaria-clara: #e3faec;
+  --cor-fundo: #f4f7f5;
   --cor-superficie: #ffffff;
-  --cor-texto: #241f3b;
-  --cor-texto-suave: #6b6584;
-  --cor-borda: #e4e1f5;
+  --cor-texto: #161f1a;
+  --cor-texto-suave: #5c6b63;
+  --cor-borda: #dfe8e2;
 
   --cor-analise-bg: #fff4de;
   --cor-analise-texto: #8a5b00;
@@ -17,11 +17,11 @@
   --cor-aprovado-texto: #1e7d32;
   --cor-reprovado-bg: #fde8e8;
   --cor-reprovado-texto: #b3261e;
-  --cor-contratado-bg: #eae5fd;
-  --cor-contratado-texto: #4529b3;
+  --cor-contratado-bg: #161f1a;
+  --cor-contratado-texto: #ffffff;
 
-  --sombra-card: 0 8px 24px rgba(108, 92, 231, 0.08);
-  --sombra-dialog: 0 24px 60px rgba(36, 31, 59, 0.28);
+  --sombra-card: 0 8px 24px rgba(22, 31, 26, 0.08);
+  --sombra-dialog: 0 24px 60px rgba(22, 31, 26, 0.32);
   --raio: 16px;
   --raio-pequeno: 10px;
 }
@@ -122,15 +122,11 @@ select {
 }
 
 .topbar__logo {
-  display: grid;
-  place-items: center;
+  display: block;
   width: 44px;
   height: 44px;
+  flex-shrink: 0;
   border-radius: var(--raio-pequeno);
-  background: var(--cor-primaria);
-  color: #fff;
-  font-weight: 700;
-  letter-spacing: 0.5px;
 }
 
 .topbar__titulo {
@@ -263,15 +259,22 @@ main {
 /* Indicadores (também funcionam como filtros de GET) */
 .indicadores__lista {
   list-style: none;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 0.9rem;
   margin: 0 0 0.5rem;
   padding: 0;
 }
 
+.indicadores__lista li {
+  flex: 1 1 130px;
+  min-width: 130px;
+  max-width: 220px;
+}
+
 .indicador {
   width: 100%;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
@@ -292,11 +295,13 @@ main {
 .indicador__numero {
   font-size: 1.6rem;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .indicador__rotulo {
   font-size: 0.85rem;
   color: var(--cor-texto-suave);
+  overflow-wrap: break-word;
 }
 
 .indicador.is-ativo {
@@ -473,7 +478,7 @@ main {
 }
 
 .dialog::backdrop {
-  background: rgba(36, 31, 59, 0.35);
+  background: rgba(22, 31, 26, 0.35);
   backdrop-filter: blur(2px);
 }
 
@@ -712,7 +717,8 @@ main {
 }
 
 @media (max-width: 420px) {
-  .indicadores__lista {
-    grid-template-columns: repeat(2, 1fr);
+  .indicadores__lista li {
+    flex-basis: calc(50% - 0.45rem);
+    max-width: none;
   }
 }
