@@ -39,6 +39,15 @@ http://localhost:8080/swagger-ui.html
 
 A especificação OpenAPI em JSON pode ser consultada em `http://localhost:8080/v3/api-docs`.
 
+## Comunicação com o front-end
+
+O CORS está configurado para permitir que um front-end executado pelo Vite acesse a API a partir destas origens:
+
+- `http://localhost:5173`
+- `http://127.0.0.1:5173`
+
+O nome da pasta do front-end, como `webApp/`, não interfere no CORS. Para o navegador, importam o protocolo, o domínio e a porta usados para abrir a página.
+
 > **Importante:** todos os dados ficam somente em uma `ArrayList`. Eles são perdidos sempre que a aplicação é reiniciada. Esse comportamento é esperado nesta etapa e não é um erro.
 
 ## Endpoints
